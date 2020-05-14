@@ -1,0 +1,123 @@
+<html>
+  <head>
+    <link rel="stylesheet" href="go.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>speech text reader</h1>
+
+      <button id="toggle" class="btn-toggle btn">toogle text btn</button>
+      <div id="text-box" class="text-box">
+        <button id="close" class="close">X</button>
+        <h3>choose voice</h3>
+        <select id="voices"></select>
+        <textarea id="text" placeholder="enter text to read"></textarea>
+        <button class="btn" id="read">read</button>
+      </div>
+      <main id="main"></main>
+    </div>
+    <script>
+      const main = document.getElementById("main");
+      const voicesSelect = document.getElementById("voices");
+      const textares = document.getElementById("text");
+      const readBtn = document.getElementById("read");
+      const toggleBtn = document.getElementById("toggle");
+      const closeBtn = document.getElementById("close");
+
+      const data = [
+        {
+          image: "./img/pic1.jpg",
+          text: "I'm happy",
+        },
+        {
+          image: "./img/pic2.jpg",
+          text: "I'm cunfused",
+        },
+        {
+          image: "./img/pic3.jpg",
+          text: "I'm very happy",
+        },
+        {
+          image: "./img/pic4.jpg",
+          text: "I'm upset",
+        },
+        {
+          image: "./img/pic5.jpg",
+          text: "i'm angry",
+        },
+        {
+          image: "./img/pic7.jpg",
+          text: "I'm love you",
+        },
+        {
+          image: "./img/pic8.jpg",
+          text: "I'm quiet",
+        },
+        {
+          image: "./img/pic8.jpg",
+          text: "I'm quiet",
+        },
+      ];
+
+      data.forEach(createBox);
+
+      function createBox(item) {
+        const box = document.createElement("div");
+        const { image, text } = item;
+        box.classList.add("box");
+        box.innerHTML = `<img src=${image} alt="${text}" />
+                      <p class="info">${text}</p>
+        `;
+        box.addEventListener("click", () => {
+          setTextMessage(text);
+          speakText();
+          box.classList.add("active");
+          setTimeout(() => box.classList.remove("active"), 800);
+        });
+        main.appendChild(box);
+      }
+      const message = new SpeechSynthesisUtterance();
+
+      let voices = [];
+      function getVoices() {
+        voices = speechSynthesis.getVoices();
+        console.log("voices", voices);
+        voices.forEach((voice) => {
+          const option = document.createElement("option");
+          option.value = voice.name;
+          option.innerText = `${voice.name} ${voice.lang}`;
+          voicesSelect.appendChild(option);
+        });
+      }
+
+      function setTextMessage(text) {
+        message.text = text;
+      }
+
+      function speakText() {
+        speechSynthesis.speak(message);
+      }
+
+      function setVoice(e) {
+        message.voice = voices.find((voice) => voice.name === e.target.value);
+        console.log("message.voice", message.voice);
+      }
+
+      speechSynthesis.addEventListener("voiceschanged", getVoices);
+
+      toggleBtn.addEventListener("click", () =>
+        document.getElementById("text-box").classList.toggle("show")
+      );
+      closeBtn.addEventListener("click", () =>
+        document.getElementById("text-box").classList.remove("show")
+      );
+
+      voicesSelect.addEventListener("change", setVoice);
+      readBtn.addEventListener("click", () => {
+        setTextMessage(textares.value);
+        speakText();
+      });
+      getVoices();
+    </script>
+  </body>
+</html>
